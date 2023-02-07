@@ -1,0 +1,37 @@
+Short:        Date/time env-var for WB titlebar
+Author:       chris@unsatisfactorysoftware.co.uk (Chris Young)
+Uploader:     chris@unsatisfactorysoftware.co.uk (Chris Young)
+Type:         util/time
+Version:      1.1
+Architecture: ppc-amigaos >= 4.0.0
+
+This is a small commodity which sits in the background and updates
+an environmental variable, which can then be displayed on the WB
+titlebar.  It is entirely configured by tooltypes:
+
+UPDATETIME = <secs>
+This is the interval between updates.
+NB: "0" will update once then quit, which is probably not what you want.
+
+ENVVAR = <env-var>
+This specifies the name of the environmental variable. Default is "time".
+
+FORMAT = <format>
+This is the date string format.
+Default is %d %b %Y %H:%M, which looks something like 01 Jan 2014 23:59
+See locale.library/FormatDate() for all possible values.
+
+To add to the WB titlebar, go into WB Prefs and add "%e time" to the
+screen title format string.  Replace "time" if you have chosen a
+different environmental variable name in the ENVVAR tooltype.
+
+It is recommended to add this commodity to WBStartUp.
+
+
+DISCLAIMER
+==========
+
+All use of this software is at your own risk.  It comes with no
+warranty either expressed or implied.  The author will take no
+responsibility for loss of data incurred directly or indirectly as a
+result of using this software.

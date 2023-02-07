@@ -1,0 +1,18 @@
+VERSION		EQU	1
+REVISION	EQU	1
+
+DATE	MACRO
+		dc.b '22.7.2014'
+		ENDM
+
+VERS	MACRO
+		dc.b 'envClock 1.1'
+		ENDM
+
+VSTRING	MACRO
+		dc.b 'envClock 1.1 (22.7.2014)',13,10,0
+		ENDM
+
+VERSTAG	MACRO
+		dc.b 0,'$VER: envClock 1.1 (22.7.2014)',0
+		ENDM
