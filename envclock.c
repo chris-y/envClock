@@ -23,6 +23,8 @@ strip -R.comment envClock
 
 #ifdef __amigaos4__
 #define CurrentDir SetCurrentDir
+#else
+#define TimeRequest timerequest
 #endif
 
 const char __attribute__((used)) *version = VERSTAG;
@@ -83,10 +85,16 @@ void killpoll()
 
 void startpoll(int time)
 {
-    tioreq->Request.io_Command=TR_ADDREQUEST;
-    tioreq->Time.Seconds = time;
-    tioreq->Time.Microseconds = 0L;
-    SendIO((struct IORequest *)tioreq);
+#ifdef __amigaos4__
+	tioreq->Request.io_Command=TR_ADDREQUEST;
+	tioreq->Time.Seconds = time;
+	tioreq->Time.Microseconds = 0L;
+#else
+	tioreq->tr_node.io_Command=TR_ADDREQUEST; 
+	tioreq->tr_time.tv_secs = time;
+	tioreq->tr_time.tv_micro = 0L;
+#endif
+	SendIO((struct IORequest *)tioreq);
 }
 
 /* Sync and start polling, returns FALSE if no new poll set up */
