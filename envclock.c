@@ -22,7 +22,7 @@ strip -R.comment envClock
 #include "envClock_rev.h"
 
 #ifdef __amigaos4__
-#define CurrentDir GetCurrentDir
+#define CurrentDir SetCurrentDir
 #endif
 
 const char __attribute__((used)) *version = VERSTAG;
