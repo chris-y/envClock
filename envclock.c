@@ -7,6 +7,7 @@ strip -R.comment envClock
 #define __USE_INLINE__
 
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 #include <proto/commodities.h>
@@ -19,6 +20,10 @@ strip -R.comment envClock
 #include <workbench/startup.h>
 
 #include "envClock_rev.h"
+
+#ifdef __amigaos4__
+#define CurrentDir GetCurrentDir
+#endif
 
 const char __attribute__((used)) *version = VERSTAG;
 
