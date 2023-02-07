@@ -218,7 +218,7 @@ void wbcleanup(void)
 	{
 		while(msg = GetMsg(broker_mp))
 			ReplyMsg(msg);
-		DeletePort(broker_mp);
+		DeleteMsgPort(broker_mp);
 	}
 
 	if(tioreq)
