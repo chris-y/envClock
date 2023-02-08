@@ -2,7 +2,7 @@ Short:        Date/time env-var for WB titlebar
 Author:       chris@unsatisfactorysoftware.co.uk (Chris Young)
 Uploader:     chris@unsatisfactorysoftware.co.uk (Chris Young)
 Type:         util/time
-Version:      1.1
+Version:      1.2
 Architecture: ppc-amigaos >= 4.0.0
 
 This is a small commodity which sits in the background and updates
@@ -27,6 +27,15 @@ different environmental variable name in the ENVVAR tooltype.
 
 It is recommended to add this commodity to WBStartUp.
 
+ChangeLog
+---------
+v1.2 (??.??.????)
+- OS3 version
+- Fix some potential issues on exit
+- Rebuild with vbcc
+
+v1.1 (22.07.2014)
+- First release
 
 DISCLAIMER
 ==========
