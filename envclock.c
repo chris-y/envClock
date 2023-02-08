@@ -57,7 +57,7 @@ struct NewBroker newbroker = {
 #ifdef __amigaos4__
 static void formatdate_cb(struct Hook *hook, struct Locale *loc, TEXT ch)
 #else
-static void __saveds formatdate_cb(struct Hook *hook __asm("a0"), struct Locale *loc __asm("a2"), char ch __asm("a1"))
+static void __saveds formatdate_cb(struct Hook *hook __asm("a0"), struct Locale *loc __asm("a2"), unsigned char ch __asm("a1"))
 #endif
 {
 	*p = ch;
