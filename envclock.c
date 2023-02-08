@@ -25,9 +25,14 @@ strip -R.comment envClock
 #define CurrentDir SetCurrentDir
 #else
 #define TimeRequest timerequest
+
+struct Library *CxBase = NULL;
+struct Library *LocaleBase = NULL;
+struct Library *IconBase = NULL;
+struct Library *WorkbenchBase = NULL;
 #endif
 
-const char __attribute__((used)) *version = VERSTAG;
+const char *version = VERSTAG;
 
 /* Global config */
 int poll = 60; //seconds
@@ -54,10 +59,21 @@ struct NewBroker newbroker = {
 	0
 };
 
+#ifdef __VBCC__
+char *strdup(const char *s)
+{
+  size_t len = strlen (s) + 1;
+  char *result = (char*) malloc (len);
+  if (result == (char*) 0)
+  return (char*) 0;
+  return (char*) memcpy (result, s, len);
+}
+#endif
+
 #ifdef __amigaos4__
 static void formatdate_cb(struct Hook *hook, struct Locale *loc, TEXT ch)
 #else
-static void __saveds formatdate_cb(struct Hook *hook __asm("a0"), struct Locale *loc __asm("a2"), ULONG ch __asm("a1"))
+static void __saveds formatdate_cb(__reg("a0") struct Hook *hook, __reg("a2") struct Locale *loc, __reg("a1") ULONG ch)
 #endif
 {
 	*p = ch;
