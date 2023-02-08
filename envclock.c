@@ -54,7 +54,11 @@ struct NewBroker newbroker = {
 	0
 };
 
-void formatdate_cb(struct Hook *hook, struct Locale *loc, TEXT ch)
+#ifdef __amigaos4__
+static void formatdate_cb(struct Hook *hook, struct Locale *loc, TEXT ch)
+#else
+static void __saveds formatdate_cb(struct Hook *hook __asm("a0"), struct Locale *loc __asm("a2"), TEXT cb __asm("a1"))
+#endif
 {
 	*p = ch;
 	p++;
@@ -211,7 +215,11 @@ void wbcleanup(void)
 	if(envvar) free(envvar);
 	if(format) free(format);
 
+#ifdef __amigaos4__
 	FreeSysObject(ASOT_HOOK, cbhook);
+#else
+	FreeVec(cbhook);
+#endif
 
 	if(broker) DeleteCxObj(broker);
 	if(broker_mp)
@@ -266,9 +274,17 @@ int main(int argc, char **argv)
 		}
 
 		if(startcx()) {
+#ifdef __amigaos4__
 			cbhook = AllocSysObjectTags(ASOT_HOOK,
 						ASOHOOK_Entry, formatdate_cb,
 						TAG_DONE);
+#else
+			if(cbhook = AllocVec(sizeof(struct Hook), MEMF_CLEAR)) {
+				cbhook->h_Entry = formatdate_cb;
+				cbhook->h_SubEntry = NULL;
+				cbhook->h_Data = NULL;
+			}
+#endif
 			msgport = CreateMsgPort();
 			tioreq= (struct TimeRequest *)CreateIORequest(msgport,sizeof(struct MsgPort));
 			OpenDevice("timer.device",UNIT_VBLANK,(struct IORequest *)tioreq,0);
