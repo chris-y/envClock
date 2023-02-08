@@ -232,7 +232,7 @@ void wbcleanup(void)
 	if(tioreq)
 	{
 		while(msg = GetMsg(msgport)) {
-        	// ReplyMsg(msg);
+        	ReplyMsg(msg);
 		}
 		if(CheckIO((struct IORequest *)tioreq)==0)
 		{
