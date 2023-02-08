@@ -15,7 +15,7 @@ jobs:
       - name: build_os4
         id: build_os4
         run: |
-          vc +newlib -o envClock_OS4 envclock.c -lauto
+          vc +newlib -o envClock_OS4 -I$AOS4_NLIB_INC -IAOS4_SDK_INC envclock.c -lauto
       - uses: actions/upload-artifact@v2
         with:
           name: envClock_OS4
@@ -30,7 +30,7 @@ jobs:
       - name: build_os3
         id: build_os3
         run: |
-          vc +aos68k -o envClock_OS3 envclock.c
+          vc +aos68k -o envClock_OS3 -I$NDK32_INC envclock.c
       - uses: actions/upload-artifact@v2
         with:
           name: envClock_OS3
