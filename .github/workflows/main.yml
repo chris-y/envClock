@@ -8,14 +8,14 @@ jobs:
   build_ppc:
     runs-on: ubuntu-latest
     container:
-      image: walkero/docker4amigavbcc:latest-ppc
+      image: amigadev/crosstools:ppc-amigaos
     name: build_os4
     steps:
       - uses: actions/checkout@v2
       - name: build_os4
         id: build_os4
         run: |
-          vc +newlib -o envClock_OS4 -I$AOS4_NLIB_INC -I$AOS4_SDK_INC envclock.c -lauto
+          gcc -Os -N -o envClock_OS4 envclock.c -lauto
       - uses: actions/upload-artifact@v2
         with:
           name: envClock_OS4
