@@ -246,6 +246,31 @@ void wbcleanup(void)
 	}
 }
 
+#ifndef __amigaos4__
+static void libs_close(void)
+{
+	if(CxBase) CloseLibrary(CxBase);
+	if(DOSBase) CloseLibrary(DOSBase);
+	if(IconBase) CloseLibrary(IconBase);
+	if(LocaleBase) CloseLibrary(LocaleBase);
+	if(WorkbenchBase) CloseLibrary(WorkbenchBase);
+}
+
+static BOOL libs_open(void)
+{
+	CxBase = OpenLibrary("commodities.library", 40);
+	DOSBase = OpenLibrary("dos.library", 40);
+	IconBase = OpenLibrary("icon.library", 40);
+	LocaleBase = OpenLibrary("locale.library", 40);
+	WorkbenchBase = OpenLibrary("workbench.library", 40);
+
+	if(CxBase && DOSBase && IconBase && LocaleBase && WorkbenchBase) return TRUE;
+	
+	libs_close();
+	return FALSE;
+}
+#endif
+
 int main(int argc, char **argv)
 {
 	struct WBStartup *WBenchMsg;
@@ -254,6 +279,10 @@ int main(int argc, char **argv)
 	LONG olddir =-1;
 	int err;
 	int rc = 0;
+	
+#ifndef __amigaos4__
+	if(libs_open() == FALSE) return 20;
+#endif
 
 	if(argc != 0) {
 		// cli startup
@@ -296,6 +325,10 @@ int main(int argc, char **argv)
 			wbcleanup();
 		}
 	}
+	
+#ifndef __amigaos4__
+	libs_close();
+#endif
 
 	return rc;
 }

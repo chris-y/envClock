@@ -30,7 +30,7 @@ jobs:
       - name: build_os3
         id: build_os3
         run: |
-          gcc -Os -N -fbaserel -o envClock_OS3 envclock.c -lauto
+          gcc -Os -N -fbaserel -o envClock_OS3 envclock.c
       - uses: actions/upload-artifact@v2
         with:
           name: envClock_OS3
