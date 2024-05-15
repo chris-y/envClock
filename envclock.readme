@@ -3,7 +3,7 @@ Author:       chris@unsatisfactorysoftware.co.uk (Chris Young)
 Uploader:     chris@unsatisfactorysoftware.co.uk (Chris Young)
 Type:         util/time
 Version:      1.2
-Architecture: ppc-amigaos >= 4.0.0
+Architecture: ppc-amigaos >= 4.0.0; m68k-amigaos >= 3.2.0
 
 This is a small commodity which sits in the background and updates
 an environmental variable, which can then be displayed on the WB
@@ -29,7 +29,7 @@ It is recommended to add this commodity to WBStartUp.
 
 ChangeLog
 ---------
-v1.2 (??.??.????)
+v1.2 (15.05.2024)
 - OS3 version
 - Fix some potential issues on exit
 - Rebuild with vbcc

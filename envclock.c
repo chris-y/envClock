@@ -22,15 +22,20 @@ strip -R.comment envClock
 #include "envClock_rev.h"
 
 #ifdef __amigaos4__
+struct CommoditiesIFace *ICommodities = NULL;
+struct IconIFace *IIcon = NULL;
+struct LocaleIFace *ILocale = NULL;
+struct WorkbenchIFace *IWorkbench = NULL;
+
 #define CurrentDir SetCurrentDir
 #else
 #define TimeRequest timerequest
+#endif
 
 struct Library *CxBase = NULL;
 struct Library *IconBase = NULL;
 struct Library *LocaleBase = NULL;
 struct Library *WorkbenchBase = NULL;
-#endif
 
 const char *version = VERSTAG;
 
@@ -262,9 +267,15 @@ static void wbcleanup(void)
 	}
 }
 
-#ifndef __amigaos4__
 static void libs_close(void)
 {
+#ifdef __amigaos4__
+	if(ICommodities) DropInterface((struct Interface *)ICommodities);
+	if(IIcon) DropInterface((struct Interface *)IIcon);
+	if(ILocale) DropInterface((struct Interface *)ILocale);
+	if(IWorkbench) DropInterface((struct Interface *)IWorkbench);
+#endif
+
 	if(CxBase) CloseLibrary(CxBase);
 	if(IconBase) CloseLibrary(IconBase);
 	if(LocaleBase) CloseLibrary((struct Library *)LocaleBase);
@@ -278,12 +289,21 @@ static BOOL libs_open(void)
 	LocaleBase = OpenLibrary("locale.library", 40);
 	WorkbenchBase = OpenLibrary("workbench.library", 40);
 
+#ifdef __amigaos4__
+	if(CxBase) ICommodities = (struct CommoditiesIFace *)GetInterface(CxBase, "main", 1, NULL);
+	if(IconBase) IIcon = (struct IconIFace *)GetInterface(IconBase, "main", 1, NULL);
+	if(LocaleBase) ILocale = (struct LocaleIFace *)GetInterface(LocaleBase, "main", 1, NULL);
+	if(WorkbenchBase) IWorkbench = (struct WorkbenchIFace *)GetInterface(WorkbenchBase, "main", 1, NULL);
+
+	if(ICommodities && IIcon && ILocale && IWorkbench) return TRUE;
+#endif
+
 	if(CxBase && IconBase && LocaleBase && WorkbenchBase) return TRUE;
 	
 	libs_close();
 	return FALSE;
 }
-#endif
+
 
 int main(int argc, char **argv)
 {
@@ -295,9 +315,7 @@ int main(int argc, char **argv)
 	int rc = 0;
 	struct Locale *loc = NULL;
 	
-#ifndef __amigaos4__
 	if(libs_open() == FALSE) return 20;
-#endif
 
 	if(argc != 0) {
 		// cli startup
@@ -343,9 +361,7 @@ int main(int argc, char **argv)
 		}
 	}
 	
-#ifndef __amigaos4__
 	libs_close();
-#endif
 
 	return rc;
 }
