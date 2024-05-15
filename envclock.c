@@ -28,6 +28,7 @@ strip -R.comment envClock
 
 struct Library *CxBase = NULL;
 struct Library *IconBase = NULL;
+struct Library *LocaleBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #endif
 
