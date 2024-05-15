@@ -27,6 +27,9 @@ different environmental variable name in the ENVVAR tooltype.
 
 It is recommended to add this commodity to WBStartUp.
 
+Please raise bugs on the GitHub repo
+https://github.com/chris-y/envClock
+
 ChangeLog
 ---------
 v1.2 (15.05.2024)

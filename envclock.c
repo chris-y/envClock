@@ -320,7 +320,7 @@ int main(int argc, char **argv)
 	if(argc != 0) {
 		// cli startup
 		printf("%s", VSTRING);
-		printf("https://www.unsatisfactorysoftware.co.uk\n\n");
+		printf("https://github.com/chris-y/envClock\n\n");
 		printf("This program must be run from Workbench.\n");
 		rc = 10;
 	} else {
