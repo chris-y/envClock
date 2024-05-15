@@ -27,7 +27,6 @@ strip -R.comment envClock
 #define TimeRequest timerequest
 
 struct Library *CxBase = NULL;
-struct Library *LocaleBase = NULL;
 struct Library *IconBase = NULL;
 struct Library *WorkbenchBase = NULL;
 #endif
@@ -60,7 +59,7 @@ struct NewBroker newbroker = {
 };
 
 #ifdef __VBCC__
-char *strdup(const char *s)
+static char *strdup(const char *s)
 {
   size_t len = strlen (s) + 1;
   char *result = (char*) malloc (len);
@@ -80,14 +79,14 @@ static void __saveds formatdate_cb(__reg("a0") struct Hook *hook, __reg("a2") st
 	p++;
 }
 
-BOOL updateenv(void)
+static BOOL updateenv(struct Locale *loc)
 {
 	struct DateStamp ds;	
 	char date[100];
 
 	p = date;
 	DateStamp(&ds);
-	FormatDate(NULL, format, &ds, cbhook);
+	FormatDate(loc, format, &ds, cbhook);
 	*p = '\0';
 
 	SetVar(envvar, date, -1, GVF_GLOBAL_ONLY);
@@ -95,7 +94,7 @@ BOOL updateenv(void)
 	return TRUE;
 }
 
-void killpoll()
+static void killpoll()
 {
 	if(CheckIO((struct IORequest *)tioreq)==0) {
     	AbortIO((struct IORequest *)tioreq);
@@ -103,7 +102,7 @@ void killpoll()
 	}
 }
 
-void startpoll(int time)
+static void startpoll(int time)
 {
 #ifdef __amigaos4__
 	tioreq->Request.io_Command=TR_ADDREQUEST;
@@ -118,9 +117,9 @@ void startpoll(int time)
 }
 
 /* Sync and start polling, returns FALSE if no new poll set up */
-BOOL env_poll()
+static BOOL env_poll(struct Locale *loc)
 {
-	if (updateenv()) {
+	if (updateenv(loc)) {
 		if(poll > 0) {
 			startpoll(poll);
 		} else {
@@ -131,7 +130,7 @@ BOOL env_poll()
 	return TRUE;
 }
 
-void main_loop()
+static void main_loop(struct Locale *loc)
 {
 	struct Message *msg;
 	ULONG sigrcvd, msgid, msgtype;
@@ -145,7 +144,7 @@ void main_loop()
 		if(sigrcvd & pollsig) {
 			while(msg = GetMsg(msgport)) {
 				// ReplyMsg(msg);
-				running = env_poll();
+				running = env_poll(loc);
 			}
 		}
 
@@ -163,7 +162,7 @@ void main_loop()
 								ActivateCxObj(broker,0L);
 							break;
 							case CXCMD_ENABLE:
-								running = env_poll();
+								running = env_poll(loc);
 								ActivateCxObj(broker,1L);
 							break;
 							case CXCMD_KILL:
@@ -185,7 +184,7 @@ void main_loop()
 	}
 }
 
-void gettooltypes(struct WBArg *wbarg)
+static void gettooltypes(struct WBArg *wbarg)
 {
 	struct DiskObject *dobj;
 	STRPTR *toolarray;
@@ -210,7 +209,7 @@ void gettooltypes(struct WBArg *wbarg)
 }
 
 
-BOOL startcx(void)
+static BOOL startcx(void)
 {
 	if(broker_mp = CreateMsgPort()) {
 		newbroker.nb_Port = broker_mp;
@@ -223,7 +222,7 @@ BOOL startcx(void)
 	return TRUE;
 }
 
-void wbcleanup(void)
+static void wbcleanup(void)
 {
 	struct Message *msg;
 
@@ -266,21 +265,19 @@ void wbcleanup(void)
 static void libs_close(void)
 {
 	if(CxBase) CloseLibrary(CxBase);
-	if(DOSBase) CloseLibrary(DOSBase);
 	if(IconBase) CloseLibrary(IconBase);
-	if(LocaleBase) CloseLibrary(LocaleBase);
+	if(LocaleBase) CloseLibrary((struct Library *)LocaleBase);
 	if(WorkbenchBase) CloseLibrary(WorkbenchBase);
 }
 
 static BOOL libs_open(void)
 {
 	CxBase = OpenLibrary("commodities.library", 40);
-	DOSBase = OpenLibrary("dos.library", 40);
 	IconBase = OpenLibrary("icon.library", 40);
 	LocaleBase = OpenLibrary("locale.library", 40);
 	WorkbenchBase = OpenLibrary("workbench.library", 40);
 
-	if(CxBase && DOSBase && IconBase && LocaleBase && WorkbenchBase) return TRUE;
+	if(CxBase && IconBase && LocaleBase && WorkbenchBase) return TRUE;
 	
 	libs_close();
 	return FALSE;
@@ -295,6 +292,7 @@ int main(int argc, char **argv)
 	LONG olddir =-1;
 	int err;
 	int rc = 0;
+	struct Locale *loc = NULL;
 	
 #ifndef __amigaos4__
 	if(libs_open() == FALSE) return 20;
@@ -303,7 +301,7 @@ int main(int argc, char **argv)
 	if(argc != 0) {
 		// cli startup
 		printf("%s", VSTRING);
-		printf("http://www.unsatisfactorysoftware.co.uk\n\n");
+		printf("https://www.unsatisfactorysoftware.co.uk\n\n");
 		printf("This program must be run from Workbench.\n");
 		rc = 10;
 	} else {
@@ -334,10 +332,12 @@ int main(int argc, char **argv)
 			tioreq= (struct TimeRequest *)CreateIORequest(msgport,sizeof(struct MsgPort));
 			OpenDevice("timer.device",UNIT_VBLANK,(struct IORequest *)tioreq,0);
 
-			if(env_poll()) {
-				main_loop();
+			if(loc = OpenLocale(NULL)) {
+				if(env_poll(loc)) {
+					main_loop(loc);
+				}
+				CloseLocale(loc);
 			}
-
 			wbcleanup();
 		}
 	}
