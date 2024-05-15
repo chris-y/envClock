@@ -53,4 +53,6 @@ dkms.conf
 
 # Executables
 envClock
+envClock_OS3
+envClock_OS4
 
